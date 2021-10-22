@@ -5,10 +5,11 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module HTMX.Types where
 
-import Css3.Selector (ToCssSelector(..))
+import Css3.Selector (ToCssSelector(..), SelectorGroup(..))
 import qualified Data.Aeson as Aeson
 import Data.Aeson (ToJSON(..), Value(..), (.=))
 import Data.Hashable (Hashable)
@@ -22,9 +23,18 @@ import Servant.Links (Link)
 data HXBoost = HXBoost deriving (Eq, Show)
 
 data HXConfirm = HXConfirm
-    { hxConfirmContents :: Text
+    { hxConfirmMessage :: Text
     }
     deriving (Eq, Show)
+
+data HXDelete = HXDelete
+    { hxDeleteLink :: Text
+    }
+    deriving (Eq, Show)
+
+data HXDisable = HXDisable deriving (Eq, Show)
+
+data HXEncoding = HXEncoding deriving (Eq, Show)
 
 data HTMXExtension =
     JSONEnc
@@ -50,16 +60,68 @@ data HXExt = HXExt
     }
     deriving (Eq, Show)
 
-data HXIndicatorVal where
-    HXIndicatorVal :: ToCssSelector a => a -> HXIndicatorVal
-    HXIndicatorValClosest :: ToCssSelector a => a -> HXIndicatorVal
-
-data HXParamsVal where
-    HXParamsVal :: [Text] -> HXParamsVal
-    HXParamsValNot :: [Text] -> HXParamsVal
-    HXParamsValAll :: HXParamsVal
-    HXParamsValNone :: HXParamsVal
+data HXGet = HXGet
+    { hxGetLink :: Text
+    }
     deriving (Eq, Show)
+
+data HXHeaders a where
+    HXHeaders :: ToJSON a => { hxHeadersJSON :: a } -> HXHeaders a
+
+deriving instance (Eq a) => Eq (HXHeaders a)
+deriving instance (Show a) => Show (HXHeaders a)
+
+data HXHistoryElt = HXHistoryElt
+
+data HXInclude = HXInclude
+    { hxIncludeSelector :: SelectorGroup
+    }
+    deriving (Eq, Show)
+
+data HXIndicator = HXIndicator
+    { hxIndicatorClosest :: Bool
+    , hxIndicatorSelector :: SelectorGroup
+    }
+    deriving (Eq, Show)
+
+data HXParams where
+    HXParams :: [Text] -> HXParams
+    HXParamsNot :: [Text] -> HXParams
+    HXParamsAll :: HXParams
+    HXParamsNone :: HXParams
+    deriving (Eq, Show)
+
+data HXPatch = HXPatch
+    { hxPatchLink :: Text
+    }
+    deriving (Eq, Show)
+
+data HXPost = HXPost
+    { hxPostLink :: Text
+    }
+    deriving (Eq, Show)
+
+data HXPreserve = HXPreserve
+    deriving (Eq, Show)
+
+data HXPrompt = HXPrompt
+    { hxPromptMessage :: Text
+    }
+    deriving (Eq, Show)
+
+data HXPushURL = HXPushURL
+    { hxPushURLLink :: Text
+    }
+    deriving (Eq, Show)
+
+data HXPut = HXPut
+    { hxPutLink :: Text
+    }
+    deriving (Eq, Show)
+
+-- TODO: HXRequest type not determined. Could just be JSON maybe?
+{-
+data HXRequest = HXRequest
 
 data MaybeJavaScript a = JustValue a | JavaScript Text
     deriving (Eq, Show)
@@ -69,14 +131,6 @@ instance ToJSON a => ToJSON (MaybeJavaScript a) where
     toJSON mbJS = case mbJS of
         JustValue val -> toJSON val
         JavaScript expr -> String expr
-
-{-
-instance Show a => Show (MaybeJavaScript a) where
-    show :: MaybeJavaScript a -> String
-    show mbJS = case mbJS of
-        JustValue val -> show val
-        JavaScript expr -> Text.unpack expr
--}
 
 data HXRequestVal = HXRequestVal
     { hxRequestValTimeout :: MaybeJavaScript Int
@@ -92,14 +146,19 @@ instance ToJSON HXRequestVal where
         , "credentials" .= hxRequestValCredentials
         , "noHeaders" .= hxRequestValNoHeaders
         ]
+-}
 
-data HXSSEVal = HXSSEVal
-    { hxSSEValConnect :: Maybe Link
-    , hxSSEValSwap :: Maybe Text
+data HXSelect = HXSelect
+    { hxSelectSelector :: SelectorGroup
     }
-    deriving (Show)
+    deriving (Eq, Show)
 
--- TODO: Come up with better, shorter, more intuitive names for types
+data HXSSE where
+    HXSSE :: { hxSSELink :: Text, hxSSEName :: Text} -> HXSSE
+    HXSSELink :: Text -> HXSSE
+    HXSSEName :: Text -> HXSSE
+    deriving (Eq, Show)
+
 data SwapPos =
     SwapPosInner
     | SwapPosOuter
@@ -110,73 +169,56 @@ data SwapPos =
     | SwapPosNone
     deriving (Eq, Show)
 
-data SwapModDelay where
-    SwapModDelay :: Int -> SwapModDelay
+data SwapDelay where
+    SwapDelay :: Int -> SwapDelay
     deriving (Eq, Show)
 
-data SwapModSettle where
-    SwapModSettle :: Int -> SwapModSettle
-    deriving(Eq, Show)
-
-data ScrollSelector where
-    ScrollSelector :: forall a. (Eq a, Show a, ToCssSelector a) => a -> ScrollSelector
-    ScrollSelectorWindow :: ScrollSelector
-
-instance Show ScrollSelector where
-    show :: ScrollSelector -> String
-    show ss = case ss of
-        ScrollSelector q -> "ScrollSelector " <> (Text.unpack $ toCssSelector q)
-        ScrollSelectorWindow -> "ScrollSelectorWindow"
-
-instance Eq ScrollSelector where
-    ss1 == ss2 = show ss1 == show ss2
-
-data ScrollMove = ScrollMoveTop | ScrollMoveBottom
+data SwapSettle where
+    SwapSettle :: Int -> SwapSettle
     deriving (Eq, Show)
 
-data SwapModViewType = SwapModViewTypeScroll | SwapModViewTypeShow
+data SwapScrollSelector where
+    SwapScrollSelector :: SelectorGroup -> SwapScrollSelector
+    SwapScrollSelectorWindow :: SwapScrollSelector
     deriving (Eq, Show)
 
-data SwapModView where
-    SwapModView :: SwapModViewType -> ScrollMove -> Maybe ScrollSelector -> SwapModView
+data SwapScrollMove = SwapScrollMoveTop | SwapScrollMoveBottom
     deriving (Eq, Show)
 
-data HXSwapVal = HXSwapVal
+data SwapViewType = SwapViewTypeScroll | SwapViewTypeShow
+    deriving (Eq, Show)
+
+data SwapView where
+    SwapView :: SwapViewType -> SwapScrollMove -> Maybe SwapScrollSelector -> SwapView
+    deriving (Eq, Show)
+
+data HXSwap = HXSwap
     { hxSwapValPos :: SwapPos
-    , hxSwapValSwap :: Maybe SwapModDelay
-    , hxSwapValSettle :: Maybe SwapModSettle
-    , hxSwapValView :: Maybe SwapModView
+    , hxSwapValSwap :: Maybe SwapDelay
+    , hxSwapValSettle :: Maybe SwapSettle
+    , hxSwapValView :: Maybe SwapView
     }
     deriving (Eq, Show)
 
-data HXSwapOOBVal where
-    HXSwapOOBVal :: HXSwapOOBVal
-    HXSwapOOBValSwap :: SwapPos -> HXSwapOOBVal
-    HXSwapOOBValSwapSelector :: forall a. (Eq a, Show a, ToCssSelector a) => SwapPos -> a -> HXSwapOOBVal
+data HXSwapOOB where
+    HXSwapOOB :: HXSwapOOB
+    HXSwapOOBSwap :: SwapPos -> HXSwapOOB
+    HXSwapOOBSwapSelector :: SwapPos -> SelectorGroup -> HXSwapOOB
 
-instance Show HXSwapOOBVal where
-    show :: HXSwapOOBVal -> String
-    show HXSwapOOBVal = "HXSwapOOBVal"
-    show (HXSwapOOBValSwap hxSwapVal) = "HXSwapOOBValSwap " <> show hxSwapVal
-    show (HXSwapOOBValSwapSelector hxSwapVal sel) = "HXSwapOOBValSwap " <> show hxSwapVal <> " " <> show sel
-
-instance Eq HXSwapOOBVal where
-    val1 == val2 = show val1 == show val2
-
-data HXTargetVal where
-    HXTargetVal :: HXTargetVal --TODO: Keep like normal or add "This" suffix?
-    HXTargetValSelector :: (Eq a, Show a, ToCssSelector a) => a -> HXTargetVal
-    HXTargetValSelectorClosest :: (Eq a, Show a, ToCssSelector a) => a -> HXTargetVal
-    HXTargetValSelectorFind :: (Eq a, Show a, ToCssSelector a) => a -> HXTargetVal
+data HXTarget where
+    HXTarget :: HXTarget --TODO: Keep like normal or add "This" suffix?
+    HXTargetSelector :: SelectorGroup -> HXTarget
+    HXTargetSelectorClosest :: SelectorGroup -> HXTarget
+    HXTargetSelectorFind :: SelectorGroup -> HXTarget
 
 -- TODO: Study more. Basically all possible events plus event modifiers.
 -- type HXTriggerVal = Text
 
-type HXTriggerVal = Text
+type HXTrigger = Text
 
 -- BELOW EXPERIMENTAL!!
 
-type HXWSVal = Text
+type HXWS = Text
 
 -- TODO: Add QuasiQuoters for parsing and generating values that are checked at compile time for the various arguments to the HTMX attributes.
 -- TODO: Write tests to check that the Val types are generating the correct Text for the HTMX attributes. Tests for HTMX tag functionality maybe?
