@@ -6,7 +6,12 @@ This package acts as a basis for the rest of the "HTMX in Haskell" ecosystem.
 The dependants of this package are:
 
 - `lucid-htmx` - For use in with the `lucid` HTML DSL.
-- `servant-htmx` - For generating type-safe HTMX AJAX calls to your `servant` API.
+- `servant-htmx` - For generating and using type-safe HTMX calls to your `servant` API.
+
+Works nicely with:
+
+- `tailwindcss` - For styling your hypermedia.
+- `alpinejs` - For adding interactivity and microinteractions to your hypermedia. 
 
 Ideas that may be implemented in the future if there's enough interest or need:
 
