@@ -1,26 +1,32 @@
 name:                htmx
 version:             0.1.0.0
-github:              "githubuser/htmx"
+github:              "WaviLabs/haskell-htmx"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2021 Author name here"
+author:              "Wavi Labs LLC"
+maintainer:          "rashad@wavilabs.com"
+copyright:           "(c) 2021 Wavi Labs LLC"
 
 extra-source-files:
 - README.md
 - ChangeLog.md
 
 # Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
+synopsis:            Generate HTMX safely using Haskell
+category:            Web, HTML
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/htmx#readme>
+description:         Please see the README on GitHub at <https://github.com/WaviLabs/haskell-htmx#readme>
 
 dependencies:
+- aeson
 - base >= 4.7 && < 5
+- css-selectors
+- hashable
+- text
+- unordered-containers
+- servant
 
 library:
   source-dirs: src

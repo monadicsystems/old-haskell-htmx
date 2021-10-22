@@ -6,12 +6,14 @@ cabal-version: 1.12
 
 name:           htmx
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/htmx#readme>
-homepage:       https://github.com/githubuser/htmx#readme
-bug-reports:    https://github.com/githubuser/htmx/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2021 Author name here
+synopsis:       Generate HTMX safely using Haskell
+description:    Please see the README on GitHub at <https://github.com/WaviLabs/haskell-htmx#readme>
+category:       Web, HTML
+homepage:       https://github.com/WaviLabs/haskell-htmx#readme
+bug-reports:    https://github.com/WaviLabs/haskell-htmx/issues
+author:         Wavi Labs LLC
+maintainer:     rashad@wavilabs.com
+copyright:      (c) 2021 Wavi Labs LLC
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -21,17 +23,25 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/htmx
+  location: https://github.com/WaviLabs/haskell-htmx
 
 library
   exposed-modules:
-      Lib
+      HTMX
+      HTMX.QuasiQuoters
+      HTMX.Types
   other-modules:
       Paths_htmx
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , css-selectors
+    , hashable
+    , servant
+    , text
+    , unordered-containers
   default-language: Haskell2010
 
 executable htmx-exe
@@ -42,8 +52,14 @@ executable htmx-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , css-selectors
+    , hashable
     , htmx
+    , servant
+    , text
+    , unordered-containers
   default-language: Haskell2010
 
 test-suite htmx-test
@@ -55,6 +71,12 @@ test-suite htmx-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , css-selectors
+    , hashable
     , htmx
+    , servant
+    , text
+    , unordered-containers
   default-language: Haskell2010
